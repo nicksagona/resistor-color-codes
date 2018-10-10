@@ -15,6 +15,7 @@ namespace Resistor\Controller;
 use Pop\Application;
 use Pop\Http\Request;
 use Pop\Http\Response;
+use Pop\Pdf\Pdf;
 use Pop\View\View;
 use Resistor\Model;
 
@@ -83,12 +84,13 @@ class IndexController extends \Pop\Controller\AbstractController
         $this->prepareView('index.phtml');
 
         if ($this->request->isPost()) {
+            $format     = strtolower($this->request->getPost('format'));
             $textValues = $this->request->getPost('text_values');
             $fileValues = null;
 
-            if ($this->request->hasFiles()) {
-                $file       = $this->request->getFiles('file_values');
-                $fileValues = file_get_contents($file['tmp_name']);
+            if ($this->request->hasFiles() && (null !== $this->request->getFiles('file_values')) &&
+                !empty($this->request->getFiles('file_values')['tmp_name'])) {
+                $fileValues = file_get_contents($this->request->getFiles('file_values')['tmp_name']);
             }
 
             if (empty($textValues) && empty($fileValues)) {
@@ -98,8 +100,41 @@ class IndexController extends \Pop\Controller\AbstractController
                 $colorCodes = new Model\ColorCodes();
                 $colorCodes->parseValues($textValues, $fileValues);
 
-                //$this->view->values = $colorCodes->getValues();
-                //$this->send();
+                $labels = $colorCodes->generateLabels($format);
+
+                if ($format == 'pdf') {
+                    $pdf = new Pdf();
+                    $pdf->outputToHttp($labels, 'resistor-labels.pdf', true);
+                } else {
+                    if (count($labels) == 1) {
+                        $imageContents = (string)$labels[0]->getResource();
+                        header('HTTP/1.1 200 OK');
+                        header('Content-Disposition: attachment; filename="resistor-labels.jpg"');
+                        header('Content-Type: image/jpeg');
+                        echo $imageContents;
+                    } else {
+                        $uid = uniqid();
+                        $zip = new \ZipArchive();
+                        $zip->open(__DIR__ . '/../../../data/tmp/resistor-labels-'. $uid . '.zip', \ZipArchive::CREATE);
+
+                        foreach ($labels as $page => $image) {
+                            $zip->addFromString('resistor-labels-' . ($page + 1) . '.jpg', (string)$image->getResource());
+                        }
+
+                        $zip->close();
+
+                        $zipContents = file_get_contents(__DIR__ . '/../../../data/tmp/resistor-labels-'. $uid . '.zip');
+
+                        if (file_exists(__DIR__ . '/../../../data/tmp/resistor-labels-'. $uid . '.zip')) {
+                            unlink(__DIR__ . '/../../../data/tmp/resistor-labels-'. $uid . '.zip');
+                        }
+
+                        header('HTTP/1.1 200 OK');
+                        header('Content-Disposition: attachment; filename="resistor-labels-'. $uid . '.zip"');
+                        header('Content-Type: application/octet-stream');
+                        echo $zipContents;
+                    }
+                }
             }
         } else {
             $this->send();
