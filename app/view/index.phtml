@@ -1,8 +1,11 @@
 <?php include 'inc/header.phtml'; ?>
     <div class="container-fluid">
         <div class="col-md-12">
-            <h1 class="title-header">Index</h1>
-            <p>This is the index page.</p>
+            <h1 class="title-header">Resistor Color Code Label Maker</h1>
+            <p>Enter the resistor values, one per line:</p>
+            <form action="/" method="post">
+                <div><textarea name="values" cols="80" rows="10"></textarea></div>
+            </form>
         </div>
     </div>
 <?php include 'inc/footer.phtml'; ?>

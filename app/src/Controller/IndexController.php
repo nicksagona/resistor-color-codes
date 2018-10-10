@@ -90,7 +90,7 @@ class IndexController extends \Pop\Controller\AbstractController
      */
     public function error()
     {
-        $this->prepareView('index.phtml');
+        $this->prepareView('error.phtml');
         $this->view->title = 'Error Page';
         $this->send(404);
     }
