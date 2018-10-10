@@ -1,7 +1,4 @@
 <?php
-/**
- * TitleNova HTTP Configuration File
- */
 return [
     'routes' => [
         '[/]' => [

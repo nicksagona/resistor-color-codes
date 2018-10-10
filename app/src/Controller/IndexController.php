@@ -100,6 +100,9 @@ class IndexController extends \Pop\Controller\AbstractController
                 $colorCodes = new Model\ColorCodes();
                 $colorCodes->parseValues($textValues, $fileValues);
 
+                //print_r($colorCodes->getValues());
+                //exit();
+
                 $labels = $colorCodes->generateLabels($format);
 
                 if ($format == 'pdf') {
