@@ -16,6 +16,7 @@ use Pop\Application;
 use Pop\Http\Request;
 use Pop\Http\Response;
 use Pop\View\View;
+use Resistor\Model;
 
 /**
  * Resistor index controller class
@@ -51,6 +52,7 @@ class IndexController extends \Pop\Controller\AbstractController
      * @var string
      */
     protected $viewPath = __DIR__ . '/../../view';
+
     /**
      * View object
      * @var View
@@ -79,8 +81,29 @@ class IndexController extends \Pop\Controller\AbstractController
     public function index()
     {
         $this->prepareView('index.phtml');
-        $this->view->title = 'Index Page';
-        $this->send();
+
+        if ($this->request->isPost()) {
+            $textValues = $this->request->getPost('text_values');
+            $fileValues = null;
+
+            if ($this->request->hasFiles()) {
+                $file       = $this->request->getFiles('file_values');
+                $fileValues = file_get_contents($file['tmp_name']);
+            }
+
+            if (empty($textValues) && empty($fileValues)) {
+                $this->view->error = true;
+                $this->send();
+            } else {
+                $colorCodes = new Model\ColorCodes();
+                $colorCodes->parseValues($textValues, $fileValues);
+
+                //$this->view->values = $colorCodes->getValues();
+                //$this->send();
+            }
+        } else {
+            $this->send();
+        }
     }
 
     /**
@@ -91,7 +114,6 @@ class IndexController extends \Pop\Controller\AbstractController
     public function error()
     {
         $this->prepareView('error.phtml');
-        $this->view->title = 'Error Page';
         $this->send(404);
     }
 

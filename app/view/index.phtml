@@ -1,11 +1,145 @@
 <?php include 'inc/header.phtml'; ?>
     <div class="container-fluid">
         <div class="col-md-12">
-            <h1 class="title-header">Resistor Color Code Label Maker</h1>
-            <p>Enter the resistor values, one per line:</p>
-            <form action="/" method="post">
-                <div><textarea name="values" cols="80" rows="10"></textarea></div>
+            <h3>Resistor Color Code</h3>
+            <h1>Label Maker</h1>
+<?php if (isset($error)): ?>
+            <h3 class="error">You must either upload a file or enter values in the textarea.</h3>
+<?php endif; ?>
+            <form id="resistor-form" action="/" method="post" enctype="multipart/form-data">
+                <div>
+                    <label for="text_values">Enter the resistor values, one per line:</label>
+                    <textarea class="form-control" name="text_values" id="text_values" cols="80" rows="10"></textarea>
+                </div>
+                <div>
+                    <label for="file_values">Upload a text file with the resistor values one to a line:</label>
+                    <input class="form-control-file resistor-file" type="file" name="file_values" id="file_values" />
+                </div>
+                <div>
+                    <label for="format">Format:</label>
+                    <select id="format" name="format" class="inline-block">
+                        <option value="pdf">PDF</option>
+                        <option value="jpg-300">JPG (300 dpi)</option>
+                        <option value="jpg-72">JPG (72 dpi)</option>
+                    </select>
+                </div>
+                <div>
+                    <button type="submit" class="btn btn-primary text-uppercase submit-btn">Submit</button>
+                </div>
             </form>
+            <table class="table table-borderless color-guide-table">
+                <thead>
+                    <tr>
+                        <th>Color</th>
+                        <th>1st Digit</th>
+                        <th>2nd Digit</th>
+                        <th>3rd Digit</th>
+                        <th>Multiplier</th>
+                        <th>Tolerance</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="code-black">Black</td>
+                        <td class="code-black">0</td>
+                        <td class="code-black">0</td>
+                        <td class="code-black">0</td>
+                        <td class="code-black">x1</td>
+                        <td>&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td class="code-brown">Brown</td>
+                        <td class="code-brown">1</td>
+                        <td class="code-brown">1</td>
+                        <td class="code-brown">1</td>
+                        <td class="code-brown">x10</td>
+                        <td class="code-brown">1%</td>
+                    </tr>
+                    <tr>
+                        <td class="code-red">Red</td>
+                        <td class="code-red">2</td>
+                        <td class="code-red">2</td>
+                        <td class="code-red">2</td>
+                        <td class="code-red">x100</td>
+                        <td class="code-red">2%</td>
+                    </tr>
+                    <tr>
+                        <td class="code-orange">Orange</td>
+                        <td class="code-orange">3</td>
+                        <td class="code-orange">3</td>
+                        <td class="code-orange">3</td>
+                        <td class="code-orange">x1000</td>
+                        <td>&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td class="code-yellow">Yellow</td>
+                        <td class="code-yellow">4</td>
+                        <td class="code-yellow">4</td>
+                        <td class="code-yellow">4</td>
+                        <td class="code-yellow">x10000</td>
+                        <td>&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td class="code-green">Green</td>
+                        <td class="code-green">5</td>
+                        <td class="code-green">5</td>
+                        <td class="code-green">5</td>
+                        <td class="code-green">x100000</td>
+                        <td class="code-green">0.5%</td>
+                    </tr>
+                    <tr>
+                        <td class="code-blue">Blue</td>
+                        <td class="code-blue">6</td>
+                        <td class="code-blue">6</td>
+                        <td class="code-blue">6</td>
+                        <td class="code-blue">x1000000</td>
+                        <td class="code-blue">0.25%</td>
+                    </tr>
+                    <tr>
+                        <td class="code-violet">Violet</td>
+                        <td class="code-violet">7</td>
+                        <td class="code-violet">7</td>
+                        <td class="code-violet">7</td>
+                        <td class="code-violet">x10000000</td>
+                        <td class="code-violet">0.1%</td>
+                    </tr>
+                    <tr>
+                        <td class="code-gray">Gray</td>
+                        <td class="code-gray">8</td>
+                        <td class="code-gray">8</td>
+                        <td class="code-gray">8</td>
+                        <td class="code-gray">x100000000</td>
+                        <td>&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td class="code-white">White</td>
+                        <td class="code-white">9</td>
+                        <td class="code-white">9</td>
+                        <td class="code-white">9</td>
+                        <td class="code-white">x1000000000</td>
+                        <td>&nbsp;</td>
+                    </tr>
+                    <tr>
+                        <td class="code-gold">Gold</td>
+                        <td>&nbsp;</td>
+                        <td>&nbsp;</td>
+                        <td>&nbsp;</td>
+                        <td class="code-gold">x0.1</td>
+                        <td class="code-gold">5%</td>
+                    </tr>
+                    <tr>
+                        <td class="code-silver">Silver</td>
+                        <td>&nbsp;</td>
+                        <td>&nbsp;</td>
+                        <td>&nbsp;</td>
+                        <td class="code-silver">x0.01</td>
+                        <td class="code-silver">10%</td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
+<?php if (isset($values)): ?>
+<?php print_r($values); ?>
+<?php endif; ?>
     </div>
 <?php include 'inc/footer.phtml'; ?>
