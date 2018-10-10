@@ -22,7 +22,7 @@ h1, h2, h3, h4, h5, h6, div, p {
 
 h1 {
   margin: 0;
-  padding: 0;
+  padding: 0 0 10px 0;
 }
 
 h3 {
@@ -44,6 +44,11 @@ fieldset {
   margin: 0;
   padding: 10px 0 10px 0;
   border-top: solid 1px #ededed;
+}
+
+.logo {
+  margin: 10px 0 0 0;
+  float: right;
 }
 
 .bold {
@@ -180,6 +185,17 @@ fieldset {
 }
 
 @media (max-width: 576px) {
+  h1, h3 {
+    text-align: center;
+  }
+
+  .logo {
+    margin: 10px auto 10px auto;
+    padding: 0;
+    float: none;
+    display: block;
+  }
+
   .submit-btn {
     float: none;
     display: block;

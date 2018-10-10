@@ -1,8 +1,4 @@
 <?php include 'inc/header.phtml'; ?>
-    <div class="container-fluid">
-        <div class="col-md-12">
-            <h3>Resistor Color Code</h3>
-            <h1>Label Maker</h1>
 <?php if (isset($error)): ?>
             <h3 class="error">You must either upload a file or enter values in the textarea.</h3>
 <?php endif; ?>
@@ -137,9 +133,4 @@
                     </tr>
                 </tbody>
             </table>
-        </div>
-<?php if (isset($values)): ?>
-<?php print_r($values); ?>
-<?php endif; ?>
-    </div>
 <?php include 'inc/footer.phtml'; ?>

@@ -15,6 +15,7 @@ namespace Resistor;
 use Pop\Application;
 use Pop\Http\Request;
 use Pop\Http\Response;
+use Pop\View\View;
 
 /**
  * Resistor module class
@@ -85,10 +86,10 @@ class Module extends \Pop\Module\Module
     public function httpError(\Exception $exception)
     {
         $response = new Response();
-        $message  = $exception->getMessage();
+        $view     = new View(__DIR__ . '/../view/exception.phtml', ['message' => $exception->getMessage()]);
 
-        $response->setHeader('Content-Type', 'application/json');
-        $response->setBody(json_encode(['error' => $message], JSON_PRETTY_PRINT) . PHP_EOL);
+        $response->setHeader('Content-Type', 'text/html');
+        $response->setBody($view->render());
         $response->send(500);
     }
 
