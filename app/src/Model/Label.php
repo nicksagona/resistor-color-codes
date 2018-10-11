@@ -174,8 +174,10 @@ class Label extends \Pop\Model\AbstractModel
             $values = array_merge($values, explode(PHP_EOL, $fileValues));
         }
 
-        foreach ($values as $key => $value) {
-            $this->values[] = new Value($value, $forceThirdDigit);
+        foreach ($values as $value) {
+            if (!empty($value)) {
+                $this->values[] = new Value($value, $forceThirdDigit);
+            }
         }
     }
 
