@@ -175,8 +175,15 @@ class Label extends \Pop\Model\AbstractModel
         }
 
         foreach ($values as $value) {
+            $value = trim($value);
             if (!empty($value)) {
-                $this->values[] = new Value($value, $forceThirdDigit);
+                $resistorValue = new Value();
+                if (is_numeric($value) && ($value >= 1000)) {
+                    $resistorValue->loadByValue($value, null, $forceThirdDigit);
+                } else {
+                    $resistorValue->setShorthand($value, $forceThirdDigit);
+                }
+                $this->values[] = $resistorValue;
             }
         }
     }

@@ -243,6 +243,8 @@ class Value
 
         if (count($places) == 1) {
             $places[] = 0;
+        } else if (count($places) > 3) {
+            $places = array_slice($places, 0, 3);
         }
 
         if (($forceThirdDigit) && (count($places) == 2)) {

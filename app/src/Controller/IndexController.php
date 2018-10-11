@@ -86,7 +86,7 @@ class IndexController extends \Pop\Controller\AbstractController
         if ($this->request->isPost()) {
             $format     = strtolower($this->request->getPost('format'));
             $textValues = $this->request->getPost('text_values');
-            $forceThird = (null !== $this->request->getPost('force_third')) ? (bool)$this->request->getPost('force_third') : false;
+            $forceThird = (null !== $this->request->getPost('allow_three_band')) ? (bool)$this->request->getPost('allow_three_band') : true;
             $fileValues = null;
 
             if ($this->request->hasFiles() && (null !== $this->request->getFiles('file_values')) &&
