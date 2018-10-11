@@ -17,7 +17,7 @@ use Pop\Pdf\Document\Page;
 use Pop\Image;
 
 /**
- * Resistor color codes model
+ * Resistor label model
  *
  * @category   Resistor
  * @package    Resistor
@@ -26,7 +26,7 @@ use Pop\Image;
  * @copyright  Copyright (c) 2018 NOLA Interactive. (http://www.nolainteractive.com)
  * @version    0.0.1-alpha
  */
-class ColorCodes extends \Pop\Model\AbstractModel
+class Label extends \Pop\Model\AbstractModel
 {
 
     /**
@@ -159,11 +159,12 @@ class ColorCodes extends \Pop\Model\AbstractModel
     /**
      * Process resistor values
      *
-     * @param  string $textValues
-     * @param  string $fileValues
+     * @param  string  $textValues
+     * @param  string  $fileValues
+     * @param  boolean $forceThirdDigit
      * @return void
      */
-    public function parseValues($textValues = null, $fileValues = null)
+    public function parseValues($textValues = null, $fileValues = null, $forceThirdDigit = false)
     {
         $values = [];
         if (null !== $textValues) {
@@ -174,106 +175,7 @@ class ColorCodes extends \Pop\Model\AbstractModel
         }
 
         foreach ($values as $key => $value) {
-            $value     = strtolower(trim($value));
-            $tolerance = null;
-            if (strrpos($value, ',') !== false) {
-                $tolerance = trim(substr($value, (strrpos($value, ',') + 1)));
-                if (strpos($tolerance, '%') === false) {
-                    $tolerance .= '%';
-                }
-                $value = substr($value, 0, strrpos($value, ','));
-            }
-
-            if (substr($value, -1) == 'k') {
-                $value = trim(substr($value, 0, -1));
-                $value = (int)($value * 1000);
-            } else if (substr($value, -1) == 'm') {
-                $value = trim(substr($value, 0, -1));
-                $value = (int)($value * 1000000);
-            } else if (substr($value, -1) == 'g') {
-                $value = trim(substr($value, 0, -1));
-                $value = (int)($value * 1000000000);
-            }
-
-            if (!empty($value) && !in_array($value, $this->values)) {
-                $first      = null;
-                $second     = null;
-                $third      = null;
-                $multiplier = null;
-
-                if ($value >= 1000000000) {
-                    $short  = (float)($value / 1000000000);
-                    $places = str_split(str_replace('.', '', $short));
-                    $short .= 'G';
-
-                    $placesNum  = implode('', $places);
-                    $multiplier = 1;
-                    while ($placesNum != $value) {
-                        $placesNum  *= 10;
-                        $multiplier *= 10;
-                    }
-                } else if (($value < 1000000000) && ($value >= 1000000)) {
-                    $short  = (float)($value / 1000000);
-                    $places = str_split(str_replace('.', '', $short));
-                    $short .= 'M';
-
-                    $placesNum  = (int)implode('', $places);
-                    $multiplier = 1;
-
-                    while ($placesNum != $value) {
-                        $placesNum  *= 10;
-                        $multiplier *= 10;
-                    }
-                } else if (($value < 1000000) && ($value >= 1000)) {
-                    $short  = (float)($value / 1000);
-                    $places = str_split(str_replace('.', '', $short));
-                    $short .= 'K';
-
-                    $placesNum  = (int)implode('', $places);
-                    $multiplier = 1;
-                    while ($placesNum != $value) {
-                        $placesNum  *= 10;
-                        $multiplier *= 10;
-                    }
-                } else {
-                    $short  = $value;
-                    $places = str_split(str_replace('.', '', $short));
-
-                    $placesNum  = (int)implode('', $places);
-                    $multiplier = 1;
-                    while ($placesNum != $value) {
-                        if ($placesNum < $value) {
-                            $placesNum  *= 10;
-                            $multiplier *= 10;
-                        } else {
-                            $placesNum  /= 10;
-                            $multiplier /= 10;
-                        }
-                    }
-                }
-
-                if (isset($places[0])) {
-                    $first = $places[0];
-                }
-                if (isset($places[1])) {
-                    $second = $places[1];
-                } else {
-                    $second = 0;
-                }
-                if (isset($places[2])) {
-                    $third = $places[2];
-                }
-
-                $this->values[] = [
-                    'first'      => $first,
-                    'second'     => $second,
-                    'third'      => $third,
-                    'multiplier' => $multiplier,
-                    'short'      => $short,
-                    'long'       => $value,
-                    'tolerance'  => $tolerance
-                ];
-            }
+            $this->values[] = new Value($value, $forceThirdDigit);
         }
     }
 
@@ -298,6 +200,11 @@ class ColorCodes extends \Pop\Model\AbstractModel
         $doc  = new Document();
         $doc->addFont(new Document\Font('Arial'));
         $doc->addFont(new Document\Font('Arial,Bold'));
+
+        $metadata = new Document\Metadata();
+        $metadata->setTitle('Resistor Color Code Label Maker');
+
+        $doc->setMetadata($metadata);
 
         for ($i = 0; $i < count($this->values); $i++) {
             if (($i % 15) == 0) {
@@ -326,65 +233,65 @@ class ColorCodes extends \Pop\Model\AbstractModel
             );
 
             $page->addText(
-                (new Page\Text($this->values[$i]['short'], 14))->setFillColor(new Page\Color\Rgb(0, 0, 0)), 'Arial,Bold', $curX + 5, $curY + 32
+                (new Page\Text($this->values[$i]->getShortHand(), 14))->setFillColor(new Page\Color\Rgb(0, 0, 0)), 'Arial,Bold', $curX + 5, $curY + 32
             );
 
             $firstRect = new Page\Path(Page\Path::FILL_STROKE);
             $firstRect->setStrokeColor(new Page\Color\Rgb(0, 0, 0))->setStroke(1)
                 ->setFillColor(new Page\Color\Rgb(
-                    $this->colors[$this->values[$i]['first']][0],
-                    $this->colors[$this->values[$i]['first']][1],
-                    $this->colors[$this->values[$i]['first']][2]
+                    $this->colors[$this->values[$i]->getFirstDigit()][0],
+                    $this->colors[$this->values[$i]->getFirstDigit()][1],
+                    $this->colors[$this->values[$i]->getFirstDigit()][2]
                 ));
 
             $firstRect->drawRectangle($curX + 48, $curY + 12, 12, 48);
 
             $page->addPath($firstRect);
             $page->addText(
-                (new Page\Text($this->values[$i]['first'], 9))->setFillColor(new Page\Color\Rgb(
-                    $this->textColors[$this->values[$i]['first']][0],
-                    $this->textColors[$this->values[$i]['first']][1],
-                    $this->textColors[$this->values[$i]['first']][2]
+                (new Page\Text($this->values[$i]->getFirstDigit(), 9))->setFillColor(new Page\Color\Rgb(
+                    $this->textColors[$this->values[$i]->getFirstDigit()][0],
+                    $this->textColors[$this->values[$i]->getFirstDigit()][1],
+                    $this->textColors[$this->values[$i]->getFirstDigit()][2]
                 )), 'Arial,Bold', $curX + 51, $curY + 15
             );
 
             $secondRect = new Page\Path(Page\Path::FILL_STROKE);
             $secondRect->setStrokeColor(new Page\Color\Rgb(0, 0, 0))->setStroke(1)
                 ->setFillColor(new Page\Color\Rgb(
-                    $this->colors[$this->values[$i]['second']][0],
-                    $this->colors[$this->values[$i]['second']][1],
-                    $this->colors[$this->values[$i]['second']][2]
+                    $this->colors[$this->values[$i]->getSecondDigit()][0],
+                    $this->colors[$this->values[$i]->getSecondDigit()][1],
+                    $this->colors[$this->values[$i]->getSecondDigit()][2]
             ));
 
             $secondRect->drawRectangle($curX + 64, $curY + 12, 12, 48);
 
             $page->addPath($secondRect);
             $page->addText(
-                (new Page\Text($this->values[$i]['second'], 9))->setFillColor(new Page\Color\Rgb(
-                    $this->textColors[$this->values[$i]['second']][0],
-                    $this->textColors[$this->values[$i]['second']][1],
-                    $this->textColors[$this->values[$i]['second']][2]
+                (new Page\Text($this->values[$i]->getSecondDigit(), 9))->setFillColor(new Page\Color\Rgb(
+                    $this->textColors[$this->values[$i]->getSecondDigit()][0],
+                    $this->textColors[$this->values[$i]->getSecondDigit()][1],
+                    $this->textColors[$this->values[$i]->getSecondDigit()][2]
                 )), 'Arial,Bold', $curX + 67, $curY + 15
             );
 
 
-            if (null !== $this->values[$i]['third']) {
+            if ($this->values[$i]->hasThirdDigit()) {
                 $thirdRect = new Page\Path(Page\Path::FILL_STROKE);
                 $thirdRect->setStrokeColor(new Page\Color\Rgb(0, 0, 0))->setStroke(1)
                     ->setFillColor(new Page\Color\Rgb(
-                        $this->colors[$this->values[$i]['third']][0],
-                        $this->colors[$this->values[$i]['third']][1],
-                        $this->colors[$this->values[$i]['third']][2]
+                        $this->colors[$this->values[$i]->getThirdDigit()][0],
+                        $this->colors[$this->values[$i]->getThirdDigit()][1],
+                        $this->colors[$this->values[$i]->getThirdDigit()][2]
                     ));
 
                 $thirdRect->drawRectangle($curX + 80, $curY + 12, 12, 48);
 
                 $page->addPath($thirdRect);
                 $page->addText(
-                    (new Page\Text($this->values[$i]['third'], 9))->setFillColor(new Page\Color\Rgb(
-                        $this->textColors[$this->values[$i]['third']][0],
-                        $this->textColors[$this->values[$i]['third']][1],
-                        $this->textColors[$this->values[$i]['third']][2]
+                    (new Page\Text($this->values[$i]->getThirdDigit(), 9))->setFillColor(new Page\Color\Rgb(
+                        $this->textColors[$this->values[$i]->getThirdDigit()][0],
+                        $this->textColors[$this->values[$i]->getThirdDigit()][1],
+                        $this->textColors[$this->values[$i]->getThirdDigit()][2]
                     )), 'Arial,Bold', $curX + 83, $curY + 15
                 );
             }
@@ -392,19 +299,19 @@ class ColorCodes extends \Pop\Model\AbstractModel
             $multiplierRect = new Page\Path(Page\Path::FILL_STROKE);
             $multiplierRect->setStrokeColor(new Page\Color\Rgb(0, 0, 0))->setStroke(1)
                 ->setFillColor(new Page\Color\Rgb(
-                    $this->colors[$this->multipliers[(string)$this->values[$i]['multiplier']]][0],
-                    $this->colors[$this->multipliers[(string)$this->values[$i]['multiplier']]][1],
-                    $this->colors[$this->multipliers[(string)$this->values[$i]['multiplier']]][2]
+                    $this->colors[$this->multipliers[(string)$this->values[$i]->getMultiplier()]][0],
+                    $this->colors[$this->multipliers[(string)$this->values[$i]->getMultiplier()]][1],
+                    $this->colors[$this->multipliers[(string)$this->values[$i]->getMultiplier()]][2]
                 ));
 
-            $multiplierText = new Page\Text($this->values[$i]['multiplier'], 7);
+            $multiplierText = new Page\Text($this->values[$i]->getMultiplier(), 7);
             $multiplierText->setRotation(90)->setFillColor(new Page\Color\Rgb(
-                $this->textColors[$this->multipliers[(string)$this->values[$i]['multiplier']]][0],
-                $this->textColors[$this->multipliers[(string)$this->values[$i]['multiplier']]][1],
-                $this->textColors[$this->multipliers[(string)$this->values[$i]['multiplier']]][2]
+                $this->textColors[$this->multipliers[(string)$this->values[$i]->getMultiplier()]][0],
+                $this->textColors[$this->multipliers[(string)$this->values[$i]->getMultiplier()]][1],
+                $this->textColors[$this->multipliers[(string)$this->values[$i]->getMultiplier()]][2]
             ));
 
-            if (null !== $this->values[$i]['third']) {
+            if ($this->values[$i]->hasThirdDigit()) {
                 $multiplierRect->drawRectangle($curX + 96, $curY + 12, 12, 48);
                 $page->addPath($multiplierRect);
                 $page->addText($multiplierText, 'Arial,Bold', $curX + 104, $curY + 15);
@@ -414,23 +321,23 @@ class ColorCodes extends \Pop\Model\AbstractModel
                 $page->addText($multiplierText, 'Arial,Bold', $curX + 88, $curY + 15);
             }
 
-            if (null !== $this->values[$i]['tolerance']) {
+            if ($this->values[$i]->hasTolerance()) {
                 $toleranceRect = new Page\Path(Page\Path::FILL_STROKE);
                 $toleranceRect->setStrokeColor(new Page\Color\Rgb(0, 0, 0))->setStroke(1)
                     ->setFillColor(new Page\Color\Rgb(
-                        $this->colors[$this->tolerance[$this->values[$i]['tolerance']]][0],
-                        $this->colors[$this->tolerance[$this->values[$i]['tolerance']]][1],
-                        $this->colors[$this->tolerance[$this->values[$i]['tolerance']]][2]
+                        $this->colors[$this->tolerance[$this->values[$i]->getTolerance()]][0],
+                        $this->colors[$this->tolerance[$this->values[$i]->getTolerance()]][1],
+                        $this->colors[$this->tolerance[$this->values[$i]->getTolerance()]][2]
                     ));
 
                 $toleranceRect->drawRectangle($curX + 120, $curY + 12, 12, 48);
 
                 $page->addPath($toleranceRect);
-                $toleranceText = new Page\Text($this->values[$i]['tolerance'], 7);
+                $toleranceText = new Page\Text($this->values[$i]->getTolerance(), 7);
                 $toleranceText->setRotation(90)->setFillColor(new Page\Color\Rgb(
-                    $this->textColors[$this->tolerance[$this->values[$i]['tolerance']]][0],
-                    $this->textColors[$this->tolerance[$this->values[$i]['tolerance']]][1],
-                    $this->textColors[$this->tolerance[$this->values[$i]['tolerance']]][2]
+                    $this->textColors[$this->tolerance[$this->values[$i]->getTolerance()]][0],
+                    $this->textColors[$this->tolerance[$this->values[$i]->getTolerance()]][1],
+                    $this->textColors[$this->tolerance[$this->values[$i]->getTolerance()]][2]
                 ));
 
                 $page->addText($toleranceText, 'Arial,Bold', $curX + 128, $curY + 15);

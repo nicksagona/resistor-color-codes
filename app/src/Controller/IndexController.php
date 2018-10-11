@@ -86,6 +86,7 @@ class IndexController extends \Pop\Controller\AbstractController
         if ($this->request->isPost()) {
             $format     = strtolower($this->request->getPost('format'));
             $textValues = $this->request->getPost('text_values');
+            $forceThird = (null !== $this->request->getPost('force_third')) ? (bool)$this->request->getPost('force_third') : false;
             $fileValues = null;
 
             if ($this->request->hasFiles() && (null !== $this->request->getFiles('file_values')) &&
@@ -97,20 +98,17 @@ class IndexController extends \Pop\Controller\AbstractController
                 $this->view->error = true;
                 $this->send();
             } else {
-                $colorCodes = new Model\ColorCodes();
-                $colorCodes->parseValues($textValues, $fileValues);
+                $label = new Model\Label();
+                $label->parseValues($textValues, $fileValues, $forceThird);
 
-                //print_r($colorCodes->getValues());
-                //exit();
-
-                $labels = $colorCodes->generateLabels($format);
+                $docs = $label->generateLabels($format);
 
                 if ($format == 'pdf') {
                     $pdf = new Pdf();
-                    $pdf->outputToHttp($labels, 'resistor-labels.pdf', true);
+                    $pdf->outputToHttp($docs, 'resistor-labels.pdf', true);
                 } else {
-                    if (count($labels) == 1) {
-                        $imageContents = (string)$labels[0]->getResource();
+                    if (count($docs) == 1) {
+                        $imageContents = (string)$docs[0]->getResource();
                         header('HTTP/1.1 200 OK');
                         header('Content-Disposition: attachment; filename="resistor-labels.jpg"');
                         header('Content-Type: image/jpeg');
@@ -120,7 +118,7 @@ class IndexController extends \Pop\Controller\AbstractController
                         $zip = new \ZipArchive();
                         $zip->open(__DIR__ . '/../../../data/tmp/resistor-labels-'. $uid . '.zip', \ZipArchive::CREATE);
 
-                        foreach ($labels as $page => $image) {
+                        foreach ($docs as $page => $image) {
                             $zip->addFromString('resistor-labels-' . ($page + 1) . '.jpg', (string)$image->getResource());
                         }
 
