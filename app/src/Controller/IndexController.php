@@ -101,14 +101,34 @@ class IndexController extends \Pop\Controller\AbstractController
                 $label = new Model\Label();
                 $label->parseValues($textValues, $fileValues, $forceThird);
 
-                $docs = $label->generateLabels($format);
+                clearstatcache();
+
+                $doc = $label->generatePdf();
 
                 if ($format == 'pdf') {
                     $pdf = new Pdf();
-                    $pdf->outputToHttp($docs, 'resistor-labels.pdf', true);
+                    $pdf->outputToHttp($doc, 'resistor-labels.pdf', true);
                 } else {
-                    if (count($docs) == 1) {
-                        $imageContents = (string)$docs[0]->getResource();
+                    $res = (strpos($format, '72') !== false) ? 72 : 300;
+                    $uid = uniqid();
+                    $pdf = new Pdf();
+                    $pdf->writeToFile($doc, __DIR__ . '/../../../data/tmp/resistor-labels-' . $uid . '.pdf');
+
+                    $images = $label->generateJpg(
+                        __DIR__ . '/../../../data/tmp/resistor-labels-' . $uid . '.pdf', $uid, $doc->getNumberOfPages(), $res
+                    );
+
+                    if (file_exists(__DIR__ . '/../../../data/tmp/resistor-labels-'. $uid . '.pdf')) {
+                        unlink(__DIR__ . '/../../../data/tmp/resistor-labels-'. $uid . '.pdf');
+                    }
+
+                    if (count($images) == 1) {
+                        $imageContents = file_get_contents($images[0]);
+
+                        if (file_exists($images[0])) {
+                            unlink($images[0]);
+                        }
+
                         header('HTTP/1.1 200 OK');
                         header('Content-Disposition: attachment; filename="resistor-labels.jpg"');
                         header('Content-Type: image/jpeg');
@@ -118,16 +138,26 @@ class IndexController extends \Pop\Controller\AbstractController
                         $zip = new \ZipArchive();
                         $zip->open(__DIR__ . '/../../../data/tmp/resistor-labels-'. $uid . '.zip', \ZipArchive::CREATE);
 
-                        foreach ($docs as $page => $image) {
-                            $zip->addFromString('resistor-labels-' . ($page + 1) . '.jpg', (string)$image->getResource());
+                        foreach ($images as $page => $image) {
+                            $zip->addFile($image, 'resistor-labels-' . ($page + 1) . '.jpg');
                         }
 
                         $zip->close();
 
                         $zipContents = file_get_contents(__DIR__ . '/../../../data/tmp/resistor-labels-'. $uid . '.zip');
 
+                        if (file_exists(__DIR__ . '/../../../data/tmp/resistor-labels-'. $uid . '.pdf')) {
+                            unlink(__DIR__ . '/../../../data/tmp/resistor-labels-'. $uid . '.pdf');
+                        }
+
                         if (file_exists(__DIR__ . '/../../../data/tmp/resistor-labels-'. $uid . '.zip')) {
                             unlink(__DIR__ . '/../../../data/tmp/resistor-labels-'. $uid . '.zip');
+                        }
+
+                        foreach ($images as $page => $image) {
+                            if (file_exists($image)) {
+                                unlink($image);
+                            }
                         }
 
                         header('HTTP/1.1 200 OK');

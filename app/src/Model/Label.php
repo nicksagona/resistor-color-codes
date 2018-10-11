@@ -180,20 +180,9 @@ class Label extends \Pop\Model\AbstractModel
     }
 
     /**
-     * Generate labels
-     *
-     * @param  string $format
-     * @return mixed
-     */
-    public function generateLabels($format)
-    {
-        return (strtolower($format) == 'pdf') ? $this->generatePdf() : $this->generateJpg($format);
-    }
-
-    /**
      * Generate PDF labels
      *
-     * @return mixed
+     * @return Document
      */
     public function generatePdf()
     {
@@ -350,46 +339,25 @@ class Label extends \Pop\Model\AbstractModel
     /**
      * Generate JPG labels
      *
-     * @param  string $format
+     * @param  string $pdf
+     * @param  string $uid
+     * @param  int    $numOfPages
+     * @param  int    $resolution
      * @return array
      */
-    public function generateJpg($format)
+    public function generateJpg($pdf, $uid, $numOfPages, $resolution = 300)
     {
         $images = [];
 
-        for ($i = 0; $i < count($this->values); $i++) {
-            if (($i % 15) == 0) {
-                $image    = Image\Imagick::create(2550, 3300);
-                $x        = 150;
-                $y        = 150;
-                $images[] = $image;
-            }
-
-            $rowY = floor($i / 3);
-
-            if ($rowY > 4) {
-                $rowY -= ((count($images) - 1) * 5);
-            }
-
-            $curX = ($x + (($i % 3) * 825));
-            $curY = ($y + ($rowY * 600));
-
-            $image->draw->setFillColor(new Image\Color\Rgb(255, 255, 255))
-                ->setStrokeColor(new Image\Color\Rgb(0, 0, 0))
-                ->setStrokeWidth(1)
-                ->rectangle($curX, $curY, 600, 300);
-
-            $image->type->setFillColor(new Image\Color\Rgb(0, 0, 0))
-                ->size(36)
-                ->font(__DIR__ . '/../../resources/assets/fonts/arial.ttf')
-                ->xy($curX + 5, $curY + 336)
-                ->text($i + 1);
-        }
-
-        if (strpos($format, '72') !== false) {
-            foreach ($images as $image) {
-                $image->resizeToWidth(612);
-            }
+        for ($i = 0; $i < $numOfPages; $i++) {
+            $filename = __DIR__ . '/../../../data/tmp/resistor-labels-' . $uid . '-' . ($i + 1) . '.jpg';
+            $img = new Image\Adapter\Imagick();
+            $img->setResolution($resolution, $resolution);
+            $img->setCompression(100);
+            $img->load($pdf . '[' . $i . ']');
+            $img->convert('jpg');
+            $img->writeToFile($filename, 100);
+            $images[] = $filename;
         }
 
         return $images;
