@@ -189,6 +189,7 @@ class Label extends \Pop\Model\AbstractModel
         $doc  = new Document();
         $doc->addFont(new Document\Font('Arial'));
         $doc->addFont(new Document\Font('Arial,Bold'));
+        $doc->setCompression(true);
 
         $metadata = new Document\Metadata();
         $metadata->setTitle('Resistor Color Code Label Maker');
@@ -352,11 +353,19 @@ class Label extends \Pop\Model\AbstractModel
         for ($i = 0; $i < $numOfPages; $i++) {
             $filename = __DIR__ . '/../../../data/tmp/resistor-labels-' . $uid . '-' . ($i + 1) . '.jpg';
             $img = new Image\Adapter\Imagick();
-            $img->setResolution($resolution, $resolution);
+            $img->setResolution(300, 300);
             $img->setCompression(100);
             $img->load($pdf . '[' . $i . ']');
             $img->convert('jpg');
             $img->writeToFile($filename, 100);
+
+            if ($resolution == 72) {
+                $img72 =  new Image\Adapter\Imagick();
+                $img72->load($filename);
+                $img72->resizeToWidth(612);
+                $img72->writeToFile();
+            }
+
             $images[] = $filename;
         }
 

@@ -2,6 +2,8 @@
 <?php if (isset($error)): ?>
             <h3 class="error">You must either upload a file or enter values in the textarea.</h3>
 <?php endif; ?>
+            <p>Examples of valid values are: 27k, 470k, 1.1M, 320, 4.7K and 1.08G. You can also specify the tolerance like this: 27K,5%</p>
+
             <form id="resistor-form" action="/" method="post" enctype="multipart/form-data">
                 <div>
                     <label for="text_values">Enter the resistor values, one per line:</label>
@@ -18,6 +20,7 @@
                         <option value="jpg-300">JPG (300 dpi)</option>
                         <option value="jpg-72">JPG (72 dpi)</option>
                     </select>
+                    <input type="checkbox" name="force_third" id="force_third" value="1" /> Force 4-band?
                 </div>
                 <div>
                     <button type="submit" class="btn btn-primary text-uppercase submit-btn">Submit</button>
