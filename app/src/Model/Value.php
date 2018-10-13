@@ -80,11 +80,12 @@ class Value
      *
      * @param string  $shortHand
      * @param boolean $forceThirdDigit
+     * @param string  $suffix
      */
-    public function __construct($shortHand = null, $forceThirdDigit = false)
+    public function __construct($shortHand = null, $forceThirdDigit = false, $suffix = null)
     {
         if (null !== $shortHand) {
-            $this->setShorthand($shortHand, $forceThirdDigit);
+            $this->setShorthand($shortHand, $forceThirdDigit, $suffix);
         }
     }
 
@@ -94,9 +95,10 @@ class Value
      * @param  int     $value
      * @param  string  $tolerance
      * @param  boolean $forceThirdDigit
+     * @param  string  $suffix
      * @return self
      */
-    public function loadByValue($value, $tolerance = null, $forceThirdDigit = false)
+    public function loadByValue($value, $tolerance = null, $forceThirdDigit = false, $suffix = null)
     {
         $this->setValue($value);
 
@@ -209,9 +211,10 @@ class Value
      *
      * @param  string  $shortHand
      * @param  boolean $forceThirdDigit
+     * @param  string  $suffix
      * @return self
      */
-    public function setShorthand($shortHand, $forceThirdDigit)
+    public function setShorthand($shortHand, $forceThirdDigit = false, $suffix = null)
     {
         $shortHand  = strtolower(trim($shortHand));
         $tolerance  = null;
@@ -249,6 +252,14 @@ class Value
 
         if (($forceThirdDigit) && (count($places) == 2)) {
             $places[] = 0;
+        }
+
+        if (null !== $suffix) {
+            if (($suffix == 'r-1000') && ($value < 1000)) {
+                $shortHand .= ' R';
+            } else if ($suffix == 'r-all') {
+                $shortHand .= ' R';
+            }
         }
 
         $this->shortHand = $shortHand;

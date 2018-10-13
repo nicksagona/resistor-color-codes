@@ -162,9 +162,10 @@ class Label extends \Pop\Model\AbstractModel
      * @param  string  $textValues
      * @param  string  $fileValues
      * @param  boolean $forceThirdDigit
+     * @param  string  $suffix
      * @return void
      */
-    public function parseValues($textValues = null, $fileValues = null, $forceThirdDigit = false)
+    public function parseValues($textValues = null, $fileValues = null, $forceThirdDigit = false, $suffix = null)
     {
         $values = [];
         if (null !== $textValues) {
@@ -179,9 +180,9 @@ class Label extends \Pop\Model\AbstractModel
             if (!empty($value)) {
                 $resistorValue = new Value();
                 if (is_numeric($value) && ($value >= 1000)) {
-                    $resistorValue->loadByValue($value, null, $forceThirdDigit);
+                    $resistorValue->loadByValue($value, null, $forceThirdDigit, $suffix);
                 } else {
-                    $resistorValue->setShorthand($value, $forceThirdDigit);
+                    $resistorValue->setShorthand($value, $forceThirdDigit, $suffix);
                 }
                 $this->values[] = $resistorValue;
             }
@@ -232,7 +233,7 @@ class Label extends \Pop\Model\AbstractModel
             );
 
             $page->addText(
-                (new Page\Text($this->values[$i]->getShortHand() . ' R', 11))->setFillColor(new Page\Color\Rgb(0, 0, 0)), 'Arial,Bold', $curX + 5, $curY + 23
+                (new Page\Text($this->values[$i]->getShortHand(), 11))->setFillColor(new Page\Color\Rgb(0, 0, 0)), 'Arial,Bold', $curX + 5, $curY + 23
             );
 
             $firstRect = new Page\Path(Page\Path::FILL_STROKE);

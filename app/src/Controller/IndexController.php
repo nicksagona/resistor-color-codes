@@ -87,6 +87,7 @@ class IndexController extends \Pop\Controller\AbstractController
             $format     = strtolower($this->request->getPost('format'));
             $textValues = $this->request->getPost('text_values');
             $forceThird = (null !== $this->request->getPost('allow_three_band')) ? (bool)$this->request->getPost('allow_three_band') : true;
+            $suffix     = ((null !== $this->request->getPost('suffix')) && ($this->request->getPost('suffix') != 'none')) ? $this->request->getPost('suffix') : null;
             $fileValues = null;
 
             if ($this->request->hasFiles() && (null !== $this->request->getFiles('file_values')) &&
@@ -99,7 +100,7 @@ class IndexController extends \Pop\Controller\AbstractController
                 $this->send();
             } else {
                 $label = new Model\Label();
-                $label->parseValues($textValues, $fileValues, $forceThird);
+                $label->parseValues($textValues, $fileValues, $forceThird, $suffix);
 
                 clearstatcache();
 
