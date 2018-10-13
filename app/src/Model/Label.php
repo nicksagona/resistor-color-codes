@@ -24,7 +24,7 @@ use Pop\Image;
  * @link       https://github.com/nicksagona/resistor-color-codes
  * @author     Nick Sagona, III <dev@nolainteractive.com>
  * @copyright  Copyright (c) 2018 NOLA Interactive. (http://www.nolainteractive.com)
- * @version    0.0.1-alpha
+ * @version    0.1-beta
  */
 class Label extends \Pop\Model\AbstractModel
 {
@@ -206,33 +206,33 @@ class Label extends \Pop\Model\AbstractModel
         $doc->setMetadata($metadata);
 
         for ($i = 0; $i < count($this->values); $i++) {
-            if (($i % 15) == 0) {
+            if (($i % 24) == 0) {
                 $page = new Page(Page::LETTER);
                 $x    = 36;
-                $y    = 684;
+                $y    = 688;
                 $doc->addPage($page);
             }
 
             $rowY = floor($i / 3);
 
-            if ($rowY > 4) {
-                $rowY -= (($doc->getNumberOfPages() - 1) * 5);
+            if ($rowY > 7) {
+                $rowY -= (($doc->getNumberOfPages() - 1) * 8);
             }
 
-            $curX = ($x + (($i % 3) * 198));
-            $curY = ($y - ($rowY * 144));
+            $curX = ($x + (($i % 3) * 193));
+            $curY = ($y - ($rowY * 90));
 
             $rectangle = new Page\Path(Page\Path::STROKE);
             $rectangle->setStrokeColor(new Page\Color\Rgb(0, 0, 0))->setStroke(1);
-            $rectangle->drawRectangle($curX, $curY, 144, 72);
+            $rectangle->drawRectangle($curX, $curY, 126, 54);
 
             $page->addPath($rectangle);
             $page->addText(
-                (new Page\Text($i + 1, 12))->setFillColor(new Page\Color\Rgb(0, 0, 0)), 'Arial', $curX + 5, $curY - 15
+                (new Page\Text($i + 1, 10))->setFillColor(new Page\Color\Rgb(0, 0, 0)), 'Arial', $curX + 2, $curY - 10
             );
 
             $page->addText(
-                (new Page\Text($this->values[$i]->getShortHand(), 14))->setFillColor(new Page\Color\Rgb(0, 0, 0)), 'Arial,Bold', $curX + 5, $curY + 32
+                (new Page\Text($this->values[$i]->getShortHand() . ' R', 11))->setFillColor(new Page\Color\Rgb(0, 0, 0)), 'Arial,Bold', $curX + 5, $curY + 23
             );
 
             $firstRect = new Page\Path(Page\Path::FILL_STROKE);
@@ -243,7 +243,7 @@ class Label extends \Pop\Model\AbstractModel
                     $this->colors[$this->values[$i]->getFirstDigit()][2]
                 ));
 
-            $firstRect->drawRectangle($curX + 48, $curY + 12, 12, 48);
+            $firstRect->drawRectangle($curX + 48, $curY + 7, 9, 40);
 
             $page->addPath($firstRect);
             $page->addText(
@@ -251,7 +251,7 @@ class Label extends \Pop\Model\AbstractModel
                     $this->textColors[$this->values[$i]->getFirstDigit()][0],
                     $this->textColors[$this->values[$i]->getFirstDigit()][1],
                     $this->textColors[$this->values[$i]->getFirstDigit()][2]
-                )), 'Arial,Bold', $curX + 51, $curY + 15
+                )), 'Arial,Bold', $curX + 50, $curY + 11
             );
 
             $secondRect = new Page\Path(Page\Path::FILL_STROKE);
@@ -262,7 +262,7 @@ class Label extends \Pop\Model\AbstractModel
                     $this->colors[$this->values[$i]->getSecondDigit()][2]
             ));
 
-            $secondRect->drawRectangle($curX + 64, $curY + 12, 12, 48);
+            $secondRect->drawRectangle($curX + 60, $curY + 7, 9, 40);
 
             $page->addPath($secondRect);
             $page->addText(
@@ -270,9 +270,8 @@ class Label extends \Pop\Model\AbstractModel
                     $this->textColors[$this->values[$i]->getSecondDigit()][0],
                     $this->textColors[$this->values[$i]->getSecondDigit()][1],
                     $this->textColors[$this->values[$i]->getSecondDigit()][2]
-                )), 'Arial,Bold', $curX + 67, $curY + 15
+                )), 'Arial,Bold', $curX + 62, $curY + 11
             );
-
 
             if ($this->values[$i]->hasThirdDigit()) {
                 $thirdRect = new Page\Path(Page\Path::FILL_STROKE);
@@ -283,7 +282,7 @@ class Label extends \Pop\Model\AbstractModel
                         $this->colors[$this->values[$i]->getThirdDigit()][2]
                     ));
 
-                $thirdRect->drawRectangle($curX + 80, $curY + 12, 12, 48);
+                $thirdRect->drawRectangle($curX + 72, $curY + 7, 9, 40);
 
                 $page->addPath($thirdRect);
                 $page->addText(
@@ -291,7 +290,7 @@ class Label extends \Pop\Model\AbstractModel
                         $this->textColors[$this->values[$i]->getThirdDigit()][0],
                         $this->textColors[$this->values[$i]->getThirdDigit()][1],
                         $this->textColors[$this->values[$i]->getThirdDigit()][2]
-                    )), 'Arial,Bold', $curX + 83, $curY + 15
+                    )), 'Arial,Bold', $curX + 74, $curY + 11
                 );
             }
 
@@ -311,13 +310,13 @@ class Label extends \Pop\Model\AbstractModel
             ));
 
             if ($this->values[$i]->hasThirdDigit()) {
-                $multiplierRect->drawRectangle($curX + 96, $curY + 12, 12, 48);
+                $multiplierRect->drawRectangle($curX + 84, $curY + 7, 9, 40);
                 $page->addPath($multiplierRect);
-                $page->addText($multiplierText, 'Arial,Bold', $curX + 104, $curY + 15);
+                $page->addText($multiplierText, 'Arial,Bold', $curX + 91, $curY + 10);
             } else {
-                $multiplierRect->drawRectangle($curX + 80, $curY + 12, 12, 48);
+                $multiplierRect->drawRectangle($curX + 72, $curY + 7, 9, 40);
                 $page->addPath($multiplierRect);
-                $page->addText($multiplierText, 'Arial,Bold', $curX + 88, $curY + 15);
+                $page->addText($multiplierText, 'Arial,Bold', $curX + 79, $curY + 10);
             }
 
             if ($this->values[$i]->hasTolerance()) {
@@ -329,7 +328,7 @@ class Label extends \Pop\Model\AbstractModel
                         $this->colors[$this->tolerance[$this->values[$i]->getTolerance()]][2]
                     ));
 
-                $toleranceRect->drawRectangle($curX + 120, $curY + 12, 12, 48);
+                $toleranceRect->drawRectangle($curX + 108, $curY + 7, 9, 40);
 
                 $page->addPath($toleranceRect);
                 $toleranceText = new Page\Text($this->values[$i]->getTolerance(), 7);
@@ -339,7 +338,7 @@ class Label extends \Pop\Model\AbstractModel
                     $this->textColors[$this->tolerance[$this->values[$i]->getTolerance()]][2]
                 ));
 
-                $page->addText($toleranceText, 'Arial,Bold', $curX + 128, $curY + 15);
+                $page->addText($toleranceText, 'Arial,Bold', $curX + 115, $curY + 11);
             }
         }
 
