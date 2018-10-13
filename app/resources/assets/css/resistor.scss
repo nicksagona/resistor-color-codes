@@ -38,6 +38,7 @@ label {
 
 fieldset {
   border: none;
+  display: inline;
 }
 
 input[type=checkbox] {
@@ -196,6 +197,18 @@ input[type=checkbox] {
 @media (max-width: 576px) {
   h1, h3 {
     text-align: center;
+  }
+
+  fieldset {
+    border: none;
+    display: block;
+    margin: 10px auto 10px auto;
+  }
+
+  #format, #suffix {
+    display: block;
+    margin: 10px auto 10px auto;
+    width: 100%;
   }
 
   .logo {
