@@ -341,6 +341,12 @@ class Label extends \Pop\Model\AbstractModel
 
                 $page->addText($toleranceText, 'Arial,Bold', $curX + 115, $curY + 11);
             }
+
+            if ($this->values[$i]->hasPower()) {
+                $page->addText(
+                    (new Page\Text('(' . $this->values[$i]->getPower() . ')', 9))->setFillColor(new Page\Color\Rgb(0, 0, 0)), 'Arial', $curX + 5, $curY + 9
+                );
+            }
         }
 
         return $doc;

@@ -74,6 +74,12 @@ class Value
     protected $tolerance = null;
 
     /**
+     * Power
+     * @var string
+     */
+    protected $power = null;
+
+    /**
      * Constructor
      *
      * Instantiate a model object
@@ -94,11 +100,11 @@ class Value
      *
      * @param  int     $value
      * @param  string  $tolerance
+     * @param  string  $power
      * @param  boolean $forceThirdDigit
-     * @param  string  $suffix
      * @return self
      */
-    public function loadByValue($value, $tolerance = null, $forceThirdDigit = false, $suffix = null)
+    public function loadByValue($value, $tolerance = null, $power = null, $forceThirdDigit = false)
     {
         $this->setValue($value);
 
@@ -136,6 +142,10 @@ class Value
             $shortHand .= ',' . $this->getTolerance();
         }
 
+        if (null !== $power) {
+            $this->setPower($power);
+        }
+
         $this->shortHand = $shortHand;
 
         return $this;
@@ -149,9 +159,10 @@ class Value
      * @param  int    $third
      * @param  mixed  $multiplier
      * @param  string $tolerance
+     * @param  string $power
      * @return self
      */
-    public function loadByDigits($first, $second, $third = null, $multiplier = null, $tolerance = null)
+    public function loadByDigits($first, $second, $third = null, $multiplier = null, $tolerance = null, $power = null)
     {
         $places = [$first, $second];
 
@@ -167,6 +178,9 @@ class Value
         }
         if (null !== $tolerance) {
             $this->setTolerance($tolerance);
+        }
+        if (null !== $power) {
+            $this->setPower($power);
         }
 
         if (null !== $multiplier) {
@@ -212,16 +226,45 @@ class Value
      * @param  string  $shortHand
      * @param  boolean $forceThirdDigit
      * @param  string  $suffix
+     * @throws Exception
      * @return self
      */
     public function setShorthand($shortHand, $forceThirdDigit = false, $suffix = null)
     {
-        $shortHand  = strtolower(trim($shortHand));
-        $tolerance  = null;
+        $shortHand = strtolower(trim($shortHand));
+        $tolerance = null;
+        $power     = null;
 
-        if (strrpos($shortHand, ',') !== false) {
-            $tolerance = trim(substr($shortHand, (strrpos($shortHand, ',') + 1)));
-            $shortHand = substr($shortHand, 0, strrpos($shortHand, ','));
+        if (strpos($shortHand, ',') !== false) {
+            $shortHandAry = explode(',', $shortHand);
+            if (count($shortHandAry) == 3) {
+                $shortHand = trim($shortHandAry[0]);
+                $pos1      = trim($shortHandAry[1]);
+                $pos2      = trim($shortHandAry[2]);
+                if (stripos($pos1, '%') !== false) {
+                    $tolerance = trim($pos1);
+                }
+                if (stripos($pos1, 'w') !== false) {
+                    $power = trim($pos1);
+                }
+                if (stripos($pos2, '%') !== false) {
+                    $tolerance = trim($pos2);
+                }
+                if (stripos($pos2, 'w') !== false) {
+                    $power = trim($pos2);
+                }
+            } else if (count($shortHandAry) == 2) {
+                $shortHand = trim($shortHandAry[0]);
+                $pos1      = trim($shortHandAry[1]);
+                if (stripos($pos1, '%') !== false) {
+                    $tolerance = trim($pos1);
+                }
+                if (stripos($pos1, 'w') !== false) {
+                    $power = trim($pos1);
+                }
+            } else {
+                throw new Exception('Error: The shorthand value did not have the allowed number of comma separators.');
+            }
         }
 
         if (substr($shortHand, -1) == 'k') {
@@ -272,6 +315,9 @@ class Value
 
         if (null !== $tolerance) {
             $this->setTolerance($tolerance);
+        }
+        if (null !== $power) {
+            $this->setPower($power);
         }
 
         return $this;
@@ -395,6 +441,22 @@ class Value
     }
 
     /**
+     * Set power
+     *
+     * @param  string $power
+     * @return self
+     */
+    public function setPower($power)
+    {
+        if (stripos($power, 'w') === false) {
+            $power .= 'W';
+        }
+
+        $this->power = strtoupper($power);
+        return $this;
+    }
+
+    /**
      * Get value
      *
      * @return int
@@ -475,6 +537,16 @@ class Value
     }
 
     /**
+     * Get power
+     *
+     * @return string
+     */
+    public function getPower()
+    {
+        return $this->power;
+    }
+
+    /**
      * Has value
      *
      * @return boolean
@@ -552,6 +624,16 @@ class Value
     public function hasTolerance()
     {
         return (null !== $this->tolerance);
+    }
+
+    /**
+     * Has power
+     *
+     * @return boolean
+     */
+    public function hasPower()
+    {
+        return (null !== $this->power);
     }
 
 }
