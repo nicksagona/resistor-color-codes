@@ -343,9 +343,29 @@ class Label extends \Pop\Model\AbstractModel
             }
 
             if ($this->values[$i]->hasPower()) {
-                $page->addText(
-                    (new Page\Text('(' . $this->values[$i]->getPower() . ')', 9))->setFillColor(new Page\Color\Rgb(0, 0, 0)), 'Arial', $curX + 5, $curY + 9
-                );
+                $power = $this->values[$i]->getPower();
+                if ($power == '0.5W') {
+                    $page->addText(
+                        (new Page\Text('\(', 9))->setFillColor(new Page\Color\Rgb(0, 0, 0)), 'Arial', $curX + 5, $curY + 9
+                    );
+                    $page->addText(
+                        (new Page\Text('1', 6))->setFillColor(new Page\Color\Rgb(0, 0, 0)), 'Arial', $curX + 10, $curY + 13
+                    );
+                    $page->addText(
+                        (new Page\Text('2', 6))->setFillColor(new Page\Color\Rgb(0, 0, 0)), 'Arial', $curX + 10, $curY + 6
+                    );
+                    $page->addPath(
+                        (new Page\Path(Page\Path::STROKE))->setStroke(0.5)->setStrokeColor(new Page\Color\Rgb(0, 0, 0))->drawLine($curX + 9, $curY + 12, $curX + 14, $curY + 12)
+                    );
+                    $page->addText(
+                        (new Page\Text('W\)', 9))->setFillColor(new Page\Color\Rgb(0, 0, 0)), 'Arial', $curX + 17, $curY + 9
+                    );
+                } else {
+                    $page->addText(
+                        (new Page\Text('\(' . $power . '\)', 9))->setFillColor(new Page\Color\Rgb(0, 0, 0)), 'Arial', $curX + 5, $curY + 9
+                    );
+                }
+
             }
         }
 
