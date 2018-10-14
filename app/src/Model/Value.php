@@ -253,6 +253,9 @@ class Value
         if (($forceThirdDigit) && (count($places) == 2)) {
             $places[] = 0;
         }
+        if (!($forceThirdDigit) && isset($places[2]) && ($places[2] == 0)) {
+            unset($places[2]);
+        }
 
         if (null !== $suffix) {
             if (($suffix == 'r-1000') && ($value < 1000)) {
