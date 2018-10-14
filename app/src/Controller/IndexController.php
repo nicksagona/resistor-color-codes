@@ -27,7 +27,7 @@ use Resistor\Model;
  * @link       https://github.com/nicksagona/resistor-color-codes
  * @author     Nick Sagona, III <dev@nolainteractive.com>
  * @copyright  Copyright (c) 2018 NOLA Interactive. (http://www.nolainteractive.com)
- * @version    0.1-beta
+ * @version    0.1
  */
 class IndexController extends \Pop\Controller\AbstractController
 {
