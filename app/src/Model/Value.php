@@ -20,7 +20,7 @@ namespace Resistor\Model;
  * @link       https://github.com/nicksagona/resistor-color-codes
  * @author     Nick Sagona, III <dev@nolainteractive.com>
  * @copyright  Copyright (c) 2018 NOLA Interactive. (http://www.nolainteractive.com)
- * @version    0.1
+ * @version    0.2
  */
 class Value
 {
@@ -78,6 +78,18 @@ class Value
      * @var string
      */
     protected $power = null;
+
+    /**
+     * Composition
+     * @var string
+     */
+    protected $comp = null;
+
+    /**
+     * Allowed composition values
+     * @var array
+     */
+    protected $allowedComps = ['CF', 'MF', 'CC', 'MO', 'CE'];
 
     /**
      * Constructor
@@ -226,7 +238,6 @@ class Value
      * @param  string  $shortHand
      * @param  boolean $forceThirdDigit
      * @param  string  $suffix
-     * @throws Exception
      * @return self
      */
     public function setShorthand($shortHand, $forceThirdDigit = false, $suffix = null)
@@ -234,36 +245,23 @@ class Value
         $shortHand = strtolower(trim($shortHand));
         $tolerance = null;
         $power     = null;
+        $comp      = null;
 
         if (strpos($shortHand, ',') !== false) {
             $shortHandAry = explode(',', $shortHand);
-            if (count($shortHandAry) == 3) {
-                $shortHand = trim($shortHandAry[0]);
-                $pos1      = trim($shortHandAry[1]);
-                $pos2      = trim($shortHandAry[2]);
-                if (stripos($pos1, '%') !== false) {
-                    $tolerance = trim($pos1);
+            $shortHand = trim($shortHandAry[0]);
+            unset($shortHandAry[0]);
+            foreach ($shortHandAry as $shortHandValue) {
+                $shortHandValue = trim($shortHandValue);
+                if (stripos($shortHandValue, '%') !== false) {
+                    $tolerance = $shortHandValue;
                 }
-                if (stripos($pos1, 'w') !== false) {
-                    $power = trim($pos1);
+                if (stripos($shortHandValue, 'w') !== false) {
+                    $power = $shortHandValue;
                 }
-                if (stripos($pos2, '%') !== false) {
-                    $tolerance = trim($pos2);
+                if (in_array(strtoupper($shortHandValue), $this->allowedComps)) {
+                    $comp = strtoupper($shortHandValue);
                 }
-                if (stripos($pos2, 'w') !== false) {
-                    $power = trim($pos2);
-                }
-            } else if (count($shortHandAry) == 2) {
-                $shortHand = trim($shortHandAry[0]);
-                $pos1      = trim($shortHandAry[1]);
-                if (stripos($pos1, '%') !== false) {
-                    $tolerance = trim($pos1);
-                }
-                if (stripos($pos1, 'w') !== false) {
-                    $power = trim($pos1);
-                }
-            } else {
-                throw new Exception('Error: The shorthand value did not have the allowed number of comma separators.');
             }
         }
 
@@ -318,6 +316,9 @@ class Value
         }
         if (null !== $power) {
             $this->setPower($power);
+        }
+        if (null !== $comp) {
+            $this->setComp($comp);
         }
 
         return $this;
@@ -457,6 +458,22 @@ class Value
     }
 
     /**
+     * Set comp
+     *
+     * @param  string $comp
+     * @return self
+     */
+    public function setComp($comp)
+    {
+        $comp = strtoupper($comp);
+        if (in_array($comp, $this->allowedComps)) {
+            $this->comp = $comp;
+        }
+
+        return $this;
+    }
+
+    /**
      * Get value
      *
      * @return int
@@ -547,6 +564,16 @@ class Value
     }
 
     /**
+     * Get comp
+     *
+     * @return string
+     */
+    public function getComp()
+    {
+        return $this->comp;
+    }
+
+    /**
      * Has value
      *
      * @return boolean
@@ -634,6 +661,16 @@ class Value
     public function hasPower()
     {
         return (null !== $this->power);
+    }
+
+    /**
+     * Has comp
+     *
+     * @return boolean
+     */
+    public function hasComp()
+    {
+        return (null !== $this->comp);
     }
 
 }

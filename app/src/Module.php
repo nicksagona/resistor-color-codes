@@ -25,7 +25,7 @@ use Pop\View\View;
  * @link       https://github.com/nicksagona/resistor-color-codes
  * @author     Nick Sagona, III <dev@nolainteractive.com>
  * @copyright  Copyright (c) 2018 NOLA Interactive. (http://www.nolainteractive.com)
- * @version    0.1
+ * @version    0.2
  */
 class Module extends \Pop\Module\Module
 {
@@ -34,7 +34,7 @@ class Module extends \Pop\Module\Module
      * Module version
      * @var string
      */
-    const VERSION = '0.1';
+    const VERSION = '0.2';
 
     /**
      * Module name

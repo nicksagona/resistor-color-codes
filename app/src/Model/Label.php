@@ -24,7 +24,7 @@ use Pop\Image;
  * @link       https://github.com/nicksagona/resistor-color-codes
  * @author     Nick Sagona, III <dev@nolainteractive.com>
  * @copyright  Copyright (c) 2018 NOLA Interactive. (http://www.nolainteractive.com)
- * @version    0.1
+ * @version    0.2
  */
 class Label extends \Pop\Model\AbstractModel
 {
@@ -342,12 +342,18 @@ class Label extends \Pop\Model\AbstractModel
                 $page->addText($toleranceText, 'Arial,Bold', $curX + 115, $curY + 11);
             }
 
+            $powerAndCompString = [];
             if ($this->values[$i]->hasPower()) {
-                $power = $this->values[$i]->getPower();
-                if ($power == '0.5W') {
-                    $page->addText(
-                        (new Page\Text('\(', 9))->setFillColor(new Page\Color\Rgb(0, 0, 0)), 'Arial', $curX + 5, $curY + 9
-                    );
+                $powerAndCompString[] = $this->values[$i]->getPower();
+            }
+            if ($this->values[$i]->hasComp()) {
+                $powerAndCompString[] = $this->values[$i]->getComp();
+            }
+
+            if (!empty($powerAndCompString)) {
+                $string = '\(' . implode(', ', $powerAndCompString) . '\)';
+                if (strpos($string, '0.5') !== false) {
+                    $string = str_replace('0.5', '   ', $string);
                     $page->addText(
                         (new Page\Text('1', 6))->setFillColor(new Page\Color\Rgb(0, 0, 0)), 'Arial', $curX + 10, $curY + 13
                     );
@@ -357,15 +363,10 @@ class Label extends \Pop\Model\AbstractModel
                     $page->addPath(
                         (new Page\Path(Page\Path::STROKE))->setStroke(0.5)->setStrokeColor(new Page\Color\Rgb(0, 0, 0))->drawLine($curX + 9, $curY + 12, $curX + 14, $curY + 12)
                     );
-                    $page->addText(
-                        (new Page\Text('W\)', 9))->setFillColor(new Page\Color\Rgb(0, 0, 0)), 'Arial', $curX + 17, $curY + 9
-                    );
-                } else {
-                    $page->addText(
-                        (new Page\Text('\(' . $power . '\)', 9))->setFillColor(new Page\Color\Rgb(0, 0, 0)), 'Arial', $curX + 5, $curY + 9
-                    );
                 }
-
+                $page->addText(
+                    (new Page\Text($string, 9))->setFillColor(new Page\Color\Rgb(0, 0, 0)), 'Arial', $curX + 5, $curY + 9
+                );
             }
         }
 
