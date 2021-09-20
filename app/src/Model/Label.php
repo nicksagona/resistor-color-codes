@@ -403,7 +403,7 @@ class Label extends \Pop\Model\AbstractModel
                 $img72 =  new Image\Adapter\Imagick();
                 $img72->load($filename);
                 $img72->resizeToWidth(612);
-                $img72->writeToFile();
+                $img72->writeToFile($filename, 100);
             }
 
             $images[] = $filename;
