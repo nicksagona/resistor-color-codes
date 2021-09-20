@@ -397,6 +397,8 @@ class Label extends \Pop\Model\AbstractModel
 
             chmod($filename, 0777);
 
+            clearstatcache();
+
             if ($resolution == 72) {
                 $img72 =  new Image\Adapter\Imagick();
                 $img72->load($filename);
