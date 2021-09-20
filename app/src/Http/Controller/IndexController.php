@@ -115,6 +115,8 @@ class IndexController extends \Pop\Controller\AbstractController
                     $pdf = new Pdf();
                     $pdf->writeToFile($doc, __DIR__ . '/../../../../data/tmp/resistor-labels-' . $uid . '.pdf');
 
+                    chmod(__DIR__ . '/../../../../data/tmp/resistor-labels-' . $uid . '.pdf', 0777);
+
                     $images = $label->generateJpg(
                         __DIR__ . '/../../../../data/tmp/resistor-labels-' . $uid . '.pdf', $uid, $doc->getNumberOfPages(), $res
                     );
