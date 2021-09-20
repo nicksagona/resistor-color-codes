@@ -1,19 +1,17 @@
 <?php include 'inc/header.phtml'; ?>
 <?php if (isset($error)): ?>
-            <h3 class="error">You must either upload a file or enter values in the textarea.</h3>
+            <h3 class="error">You must enter values in the textarea.</h3>
 <?php endif; ?>
-            <p>
-                Examples of valid values are: 27k, 470k, 1.1M, 320, 4.7K and 1.08G. You can also specify the tolerance, power and composition like this: 27K,5%,0.5W,CC or 100K,1%,3W,MO<br />
+            <p class="center">
+                Examples values: 27k, 470k, 1.1M, 320, 4.7K and 1.08G.<br /><br />
+                You can also specify the tolerance, power and composition like this:<br />
+                27K,5%,0.5W,CC or 100K,1%,3W,MO<br /><br />
                 <em>(CF = Carbon Film, MF = Metal Film, CC = Carbon Comp, MO = Metal Oxide, CE = Ceramic Comp)</em>
             </p>
             <form id="resistor-form" action="/" method="post" enctype="multipart/form-data">
                 <div>
                     <label for="text_values">Enter the resistor values, one per line:</label>
                     <textarea class="form-control" name="text_values" id="text_values" cols="80" rows="10"></textarea>
-                </div>
-                <div>
-                    <label for="file_values">Upload a text file with the resistor values one to a line:</label>
-                    <input class="form-control-file resistor-file" type="file" name="file_values" id="file_values" />
                 </div>
                 <div>
                     <label for="format">Format:</label>
@@ -32,7 +30,7 @@
                     </fieldset>
                 </div>
                 <div>
-                    <button type="submit" class="btn btn-primary text-uppercase submit-btn">Submit</button>
+                    <button type="submit" class="btn btn-md btn-info btn-block text-uppercase">Submit</button>
                 </div>
             </form>
             <table class="table table-borderless color-guide-table">

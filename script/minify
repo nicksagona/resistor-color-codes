@@ -1,0 +1,13 @@
+#!/bin/bash
+#
+# Minify Script
+#
+
+echo -e "Minifying JS..."
+minify --output "../public/assets/js/app.min.js" "../app/resources/js/app.js"
+
+echo -e
+echo -e "Minifying CSS..."
+minify --output "../public/assets/css/app.min.css" "../app/resources/css/app.css"
+
+echo -e "Done!"

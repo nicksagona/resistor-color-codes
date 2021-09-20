@@ -1,31 +1,20 @@
 {
     "name": "nicksagona/resistor-color-codes",
     "description": "Resistor Color Code Label Maker",
-    "keywords": [
-        "resistor",
-        "color codes",
-        "label maker"
-    ],
-    "license": "BSD-3-Clause",
     "authors": [
         {
             "name": "Nick Sagona",
-            "email": "dev@nolainteractive.com"
+            "email": "nick@nolainteractive.com"
         }
     ],
     "require": {
         "php": ">=7.3.0",
-        "popphp/popphp": "^3.6.3",
-        "popphp/pop-http": "^4.0.7",
-        "popphp/pop-kettle": "^1.5.2",
-        "popphp/pop-view": "^3.2.1",
-        "popphp/pop-image": "^3.4.1",
-        "popphp/pop-pdf": "^4.0.0"
+        "popphp/popphp-framework": "^4.6.0"
     },
     "require-dev": {
-        "phpunit/phpunit": "^7.0.0"
+        "phpunit/phpunit": "^9.5.0"
     },
-    "autoload": {
+    "autoload" : {
         "psr-4": {
             "Resistor\\": "app/src/"
         }
@@ -37,7 +26,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "0.1.x-dev"
+            "dev-master": "0.0.x-dev"
         }
     }
 }
