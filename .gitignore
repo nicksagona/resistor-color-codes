@@ -1,3 +1,4 @@
+.phpunit.result.cache
 /app/config/api.php
 /logs
 composer.lock
