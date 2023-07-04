@@ -18,6 +18,7 @@ use Pop\Http\Server\Response;
 use Pop\Pdf\Pdf;
 use Pop\View\View;
 use Resistor\Model;
+use Resistor\Module;
 
 /**
  * Resistor index controller class
@@ -27,7 +28,7 @@ use Resistor\Model;
  * @link       https://github.com/nicksagona/resistor-color-codes
  * @author     Nick Sagona, III <dev@nolainteractive.com>
  * @copyright  Copyright (c) 2018 NOLA Interactive. (http://www.nolainteractive.com)
- * @version    0.6
+ * @version    1.0.0
  */
 class IndexController extends \Pop\Controller\AbstractController
 {
@@ -263,7 +264,8 @@ class IndexController extends \Pop\Controller\AbstractController
      */
     protected function prepareView($template)
     {
-        $this->view = new View($this->viewPath . '/' . $template);
+        $this->view          = new View($this->viewPath . '/' . $template);
+        $this->view->version = Module::VERSION;
     }
 
     /**

@@ -87,6 +87,12 @@ input[type=text], textarea {
   text-align: center;
 }
 
+.footer {
+  margin: 20px 0 20px 0;
+  padding: 20px 0 20px 0;
+  font-size: 0.9em;
+}
+
 .inline-block {
   display: inline-block;
 }
