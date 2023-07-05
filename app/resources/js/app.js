@@ -5,7 +5,7 @@
 var app = {
     addEmail: function(emailId) {
         var emailUser   = ['t','c','a','t','n','o','c'];
-        var emailDomain = window.location.host.replace('www.', '').replace('calc.', '');
+        var emailDomain = window.location.host.replace('www.', '').replace('resistors.', '');
         var email       = emailUser.reverse().join('') + '@' + emailDomain;
         var emailHref   = 'mailto:' + email + '?subject=SonicTone Resistor Color Codes';
         var emailTags   = $(emailId);
